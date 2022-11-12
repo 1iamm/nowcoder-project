@@ -1,6 +1,7 @@
 package com.nowcoder.community.controller;
 
 import com.nowcoder.community.service.AlphaService;
+import com.nowcoder.community.util.CommunityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.codec.multipart.PartHttpMessageWriter;
 import org.springframework.stereotype.Controller;
@@ -8,8 +9,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
@@ -29,7 +32,7 @@ public class AlphaController {
 
     @RequestMapping("/data")
     @ResponseBody
-    public String getData(){
+    public String getData() {
         return alphaService.find();
     }
 
@@ -53,7 +56,7 @@ public class AlphaController {
         // 1.需要设置返回数据的类型
         response.setContentType("text/html;charset=utf-8"); // 返回html的文本数据
         // 2.获取输出流
-        try(
+        try (
                 PrintWriter writer = response.getWriter(); //在try()括号中创建，try中运行完后会自动close
         ) {
             writer.write("<h1>牛客网</h1>"); //输出一级标题牛客网
@@ -154,6 +157,83 @@ public class AlphaController {
         return list; //会自动转成JSON字符串
     }
 
+    // cookie示例，浏览器初次访问服务器，服务器发送cookie给浏览器
+    @RequestMapping(path = "/cookie/set", method = RequestMethod.GET)
+    @ResponseBody //即不返回HTML格式
+    public String setCookie(HttpServletResponse httpServletResponse) { //利用response传送数据给浏览器
+//        创建cookie，cookie为Key-value结构并且只能存一对key-value
+        Cookie cookie = new Cookie("code", CommunityUtil.generateUUID());
+//        设置cookie生效范围
+        cookie.setPath("/community/alpha");
+//        cookie生存时间，单位是s
+        cookie.setMaxAge(60 * 10);
+//        发送cookie
+        httpServletResponse.addCookie(cookie);
 
+        return "set cookie";
+    }
+
+    @RequestMapping(path = "/cookie/get", method = RequestMethod.GET)
+    @ResponseBody
+    public String getCookie(@CookieValue("code") String code) {
+        System.out.println(code);
+        return "get cookie";
+    }
+
+//    session示例
+    @RequestMapping(path = "/session/set", method = RequestMethod.GET)
+    @ResponseBody  //session只需要声明，springMVC会自动注入
+    public String setSession(HttpSession session) {
+        //session可以存多个key-value，因为存在服务端不用来回传
+        session.setAttribute("id", 1);
+        session.setAttribute("name", "Test");
+        return "set session";
+    }
+
+    @RequestMapping(path = "/session/get", method = RequestMethod.GET)
+    @ResponseBody  //session只需要声明，springMVC会自动注入
+    public String getSession(HttpSession session) {
+        System.out.println(session.getAttribute("id"));
+        System.out.println(session.getAttribute("name"));
+        return "get session";
+    }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
