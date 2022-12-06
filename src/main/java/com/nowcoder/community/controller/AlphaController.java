@@ -180,7 +180,7 @@ public class AlphaController {
         return "get cookie";
     }
 
-//    session示例
+    //    session示例
     @RequestMapping(path = "/session/set", method = RequestMethod.GET)
     @ResponseBody  //session只需要声明，springMVC会自动注入
     public String setSession(HttpSession session) {
@@ -197,6 +197,16 @@ public class AlphaController {
         System.out.println(session.getAttribute("name"));
         return "get session";
     }
+
+    //ajax实例
+    @RequestMapping(path = "/ajax", method = RequestMethod.POST)
+    @ResponseBody
+    public String testAjax(String name, int age) {
+        System.out.println(name);
+        System.out.println(age);
+        return CommunityUtil.getJSONString(0, "操作成功！");
+    }
+
 
 }
 
